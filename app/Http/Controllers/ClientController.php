@@ -46,7 +46,8 @@ class ClientController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $client = Client::with('tickets')->findOrFail($id);
+        return response()->json($client,201);
     }
 
     /**
@@ -62,7 +63,17 @@ class ClientController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $client = Client::findOrFail($id);
+
+        $validated = $request->validate([
+            'nome'     => 'sometimes|string|max:255',
+            'email'    => 'sometimes|email|unique:clients,email,' . $id,
+            'telefono' => 'nullable|string|max:20',
+            'azienda'  => 'nullable|string|max:255',
+        ]);
+
+        $client->update($validated);
+        return response()->json($client);
     }
 
     /**
@@ -70,6 +81,7 @@ class ClientController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        Client::findOrFail($id)->delete();
+        return response()->noContent();
     }
 }
