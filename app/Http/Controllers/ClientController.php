@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
 use Illuminate\Http\Request;
 
 class ClientController extends Controller
@@ -11,7 +12,8 @@ class ClientController extends Controller
      */
     public function index()
     {
-        //
+        $clients = Client::all();
+        return response()->json($clients);
     }
 
     /**
@@ -27,7 +29,16 @@ class ClientController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'nome'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:clients',
+            'telefono' => 'nullable|string|max:20',
+            'azienda'  => 'nullable|string|max:255',
+        ]);
+
+            $client = Client::create($validated);
+            return response()->json($client, 201);
+
     }
 
     /**
