@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('client_id')->constrained()->cascadeOnDelete();
+            $table->string('titolo');
+            $table->text('descrizione');
+            $table->enum('status', ['aperto', 'in_lavorazione', 'chiuso'])->default('aperto');
+            $table->enum('priorita', ['bassa', 'media', 'alta'])->default('media');
+            $table->string('categoria')->nullable();
             $table->timestamps();
         });
     }
