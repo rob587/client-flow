@@ -11,7 +11,8 @@ class TicketController extends Controller
      */
     public function index()
     {
-        //
+        $tickets = Ticket::with('client')->get();
+        return response()->json($tickets);
     }
 
     /**
@@ -27,7 +28,15 @@ class TicketController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'client_id'   => 'required|exists:clients,id',
+            'titolo'      => 'required|string|max:255',
+            'descrizione' => 'required|string',
+            'priorita'    => 'sometimes|in:bassa,media,alta',
+        ]);
+
+        $ticket = Ticket::create($validated);
+        return response()->json($ticket->load('client'), 201);
     }
 
     /**
@@ -35,7 +44,8 @@ class TicketController extends Controller
      */
     public function show(string $id)
     {
-        //
+         $ticket = Ticket::with(['client', 'messages.user'])->findOrFail($id);
+        return response()->json($ticket);
     }
 
     /**
@@ -51,7 +61,18 @@ class TicketController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+           $ticket = Ticket::findOrFail($id);
+
+        $validated = $request->validate([
+            'titolo'      => 'sometimes|string|max:255',
+            'descrizione' => 'sometimes|string',
+            'status'      => 'sometimes|in:aperto,in_lavorazione,chiuso',
+            'priorita'    => 'sometimes|in:bassa,media,alta',
+            'categoria'   => 'nullable|string|max:255',
+        ]);
+
+        $ticket->update($validated);
+        return response()->json($ticket);
     }
 
     /**
@@ -59,6 +80,7 @@ class TicketController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+         Ticket::findOrFail($id)->delete();
+        return response()->noContent();
     }
 }
