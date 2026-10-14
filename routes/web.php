@@ -8,3 +8,6 @@ use App\Http\Controllers\TicketMessageController;
 Route::apiResource('clients', ClientController::class);
 Route::apiResource('tickets', TicketController::class);
 Route::post('/tickets/{ticketId}/messages', [TicketMessageController::class, 'store']);
+Route::get('/', function () {
+    return response()->json(['status' => 'ClientFlow in corso']);
+});
