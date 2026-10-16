@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Ticket;
+use App\Services\TriageService;
 
 class TicketController extends Controller
 {
@@ -28,12 +29,23 @@ class TicketController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
+    
+    
     {
         $validated = $request->validate([
             'client_id'   => 'required|exists:clients,id',
             'titolo'      => 'required|string|max:255',
             'descrizione' => 'required|string',
             'priorita'    => 'sometimes|in:bassa,media,alta',
+        ]);
+
+
+        $triage = $this->triage->analizza($validated['titolo'], $validated['descrizione']);
+
+        $ticket = Ticket::create([
+            ...$validated,
+            'categoria' => $triage['categoria'],
+            'priorita'  => $validated['priorita'] ?? $triage['priorita'],
         ]);
 
         $ticket = Ticket::create($validated);
