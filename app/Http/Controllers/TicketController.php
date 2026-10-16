@@ -8,6 +8,8 @@ use App\Services\TriageService;
 
 class TicketController extends Controller
 {
+
+public function __construct(private TriageService $triage) {}
     /**
      * Display a listing of the resource.
      */
@@ -48,7 +50,7 @@ class TicketController extends Controller
             'priorita'  => $validated['priorita'] ?? $triage['priorita'],
         ]);
 
-        $ticket = Ticket::create($validated);
+    
         return response()->json($ticket->load('client'), 201);
     }
 

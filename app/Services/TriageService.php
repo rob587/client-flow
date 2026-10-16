@@ -11,8 +11,10 @@ class TriageService
 
     public function __construct()
     {
-        $this->client = new Client();
-        $this->apiKey = config('services.groq.key');
+        $this->client = new Client([
+        'verify' => false
+    ]);
+    $this->apiKey = config('services.groq.key');
     }
 
     public function analizza(string $titolo, string $descrizione): array
@@ -31,7 +33,7 @@ Rispondi esattamente in questo formato:
                 'Content-Type'  => 'application/json',
             ],
             'json' => [
-                'model'    => 'llama-3.3-70b-versatile',
+                'model'    => "openai/gpt-oss-20b",
                 'messages' => [
                     ['role' => 'user', 'content' => $prompt]
                 ],
