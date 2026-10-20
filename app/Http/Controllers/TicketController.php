@@ -78,24 +78,26 @@ public function __construct(private TriageService $triage) {}
      */
     public function update(Request $request, string $id)
     {
-           $ticket = Ticket::findOrFail($id);
+        $ticket = Ticket::findOrFail($id);
 
-        $validated = $request->validate([
-            'titolo'      => 'sometimes|string|max:255',
-            'descrizione' => 'sometimes|string',
-            'status'      => 'sometimes|in:aperto,in_lavorazione,chiuso',
-            'priorita'    => 'sometimes|in:bassa,media,alta',
-            'categoria'   => 'nullable|string|max:255',
-        ]);
+    $validated = $request->validate([
+        'titolo'      => 'sometimes|string|max:255',
+        'descrizione' => 'sometimes|string',
+        'status'      => 'sometimes|in:aperto,in_lavorazione,chiuso',
+        'priorita'    => 'sometimes|in:bassa,media,alta',
+        'categoria'   => 'nullable|string|max:255',
+    ]);
 
-        $ticket->update($validated);
+    $statusCambiato = isset($validated['status']) && $validated['status'] !== $ticket->status;
 
-          if ($statusCambiato) {
-            $email = $ticket->client->email;
-            Mail::to($email)->send(new TicketStatusUpdated($ticket));
-        }
+    $ticket->update($validated);
 
-        return response()->json($ticket);
+    if ($statusCambiato) {
+        $email = $ticket->client->email;
+        Mail::to($email)->send(new TicketStatusUpdated($ticket));
+    }
+
+    return response()->json($ticket);
     }
 
     /**
