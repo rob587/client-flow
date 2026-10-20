@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Mail\TicketStatusUpdated;
 use App\Models\Ticket;
 use App\Services\TriageService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class TicketController extends Controller
 {
@@ -87,6 +89,12 @@ public function __construct(private TriageService $triage) {}
         ]);
 
         $ticket->update($validated);
+
+          if ($statusCambiato) {
+            $email = $ticket->client->email;
+            Mail::to($email)->send(new TicketStatusUpdated($ticket));
+        }
+
         return response()->json($ticket);
     }
 
