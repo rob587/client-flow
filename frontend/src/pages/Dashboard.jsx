@@ -1,8 +1,30 @@
 import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
+import { useEffect, useState } from "react";
 
 const Dashboard = () => {
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem("user"));
+    const [stats, setStats] = useState({
+        aperti: 0,
+        inLavorazione: 0,
+        clienti: 0,
+    });
+
+    useEffect(() => {
+        Promise.all([api.get("/tickets"), api.get("/clients")])
+            .then(([ticketsRes, clientsRes]) => {
+                const tickets = ticketsRes.data;
+                setStats({
+                    aperti: tickets.filter((t) => t.status === "aperto").length,
+                    inLavorazione: tickets.filter(
+                        (t) => t.status === "in_lavorazione",
+                    ).length,
+                    clienti: clientsRes.data.length,
+                });
+            })
+            .catch(() => navigate("/login"));
+    }, []);
 
     const logout = () => {
         localStorage.removeItem("token");
@@ -76,7 +98,7 @@ const Dashboard = () => {
                                 Ticket aperti
                             </p>
                             <p className="text-3xl font-bold text-zinc-100 mt-1">
-                                —
+                                {stats.aperti}
                             </p>
                         </div>
                         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
@@ -84,7 +106,7 @@ const Dashboard = () => {
                                 In lavorazione
                             </p>
                             <p className="text-3xl font-bold text-zinc-100 mt-1">
-                                —
+                                {stats.inLavorazione}
                             </p>
                         </div>
                         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
@@ -92,7 +114,7 @@ const Dashboard = () => {
                                 Clienti totali
                             </p>
                             <p className="text-3xl font-bold text-zinc-100 mt-1">
-                                —
+                                {stats.clienti}
                             </p>
                         </div>
                     </div>
