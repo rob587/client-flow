@@ -3,7 +3,6 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,17 +11,21 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-          $middleware->validateCsrfTokens(except: [
-        '*'
-    ]);
+  ->withMiddleware(function (Middleware $middleware) {
+    $middleware->validateCsrfTokens(except: ['*']);
 
-     $middleware->alias([
+    $middleware->alias([
         'role' => \App\Http\Middleware\CheckRole::class,
     ]);
-    })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
-        );
-    })->create();
+
+    $middleware->append(\Illuminate\Http\Middleware\HandleCors::class);
+
+    $middleware->prependToGroup('api', \App\Http\Middleware\ForceJsonResponse::class);
+})
+   ->withExceptions(function (Exceptions $exceptions) {
+    $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, $request) {
+        if ($request->is('api/*')) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+    });
+})->create();
