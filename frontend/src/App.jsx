@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Tickets from "./pages/Tickets";
+import Clients from "./pages/Clients";
 
 function App() {
     const token = localStorage.getItem("token");
@@ -21,6 +22,10 @@ function App() {
                 <Route
                     path="*"
                     element={<Navigate to={token ? "/dashboard" : "/login"} />}
+                />
+                <Route
+                    path="/clients"
+                    element={token ? <Clients /> : <Navigate to="/login" />}
                 />
             </Routes>
         </>
