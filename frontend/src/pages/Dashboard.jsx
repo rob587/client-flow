@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { useEffect, useState } from "react";
+import Sidebar from "../components/Sidebar";
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -36,54 +37,7 @@ const Dashboard = () => {
         <>
             <div className="min-h-screen bg-zinc-950 flex">
                 {/* Sidebar */}
-                <aside className="w-60 bg-zinc-900 border-r border-zinc-800 flex flex-col">
-                    <div className="px-6 py-5 border-b border-zinc-800">
-                        <h1 className="text-lg font-semibold text-zinc-100">
-                            Client<span className="text-amber-400">Flow</span>
-                        </h1>
-                    </div>
-
-                    <nav className="flex-1 px-3 py-4 space-y-1">
-                        <button
-                            onClick={() => navigate("/dashboard")}
-                            className="w-full text-left px-3 py-2 rounded-lg text-sm text-amber-400 bg-amber-400/10 font-medium"
-                        >
-                            Dashboard
-                        </button>
-                        <button
-                            onClick={() => navigate("/tickets")}
-                            className="w-full text-left px-3 py-2 rounded-lg text-sm text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
-                        >
-                            Ticket
-                        </button>
-                        <button
-                            onClick={() => navigate("/clients")}
-                            className="w-full text-left px-3 py-2 rounded-lg text-sm text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
-                        >
-                            Clienti
-                        </button>
-                    </nav>
-
-                    {/* User info */}
-                    <div className="px-4 py-4 border-t border-zinc-800">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-medium text-zinc-100">
-                                    {user?.name}
-                                </p>
-                                <p className="text-xs text-zinc-500">
-                                    {user?.role}
-                                </p>
-                            </div>
-                            <button
-                                onClick={logout}
-                                className="text-xs text-zinc-500 hover:text-red-400 transition-colors"
-                            >
-                                Esci
-                            </button>
-                        </div>
-                    </div>
-                </aside>
+                <Sidebar />
 
                 {/* Main content */}
                 <main className="flex-1 p-8">
