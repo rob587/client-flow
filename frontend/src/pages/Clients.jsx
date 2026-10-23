@@ -15,6 +15,32 @@ const Clients = () => {
     const [errore, setErrore] = useState("");
     const navigate = useNavigate();
 
+    const fetchClients = () => {
+        api.get("/clients")
+            .then((res) => setClients(res.data))
+            .catch(() => navigate("/login"))
+            .finally(() => setLoading(false));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setErrore("");
+        try {
+            await api.post("/clients", form);
+            setForm({ nome: "", email: "", telefono: "", azienda: "" });
+            setShowForm(false);
+            fetchClients();
+        } catch (err) {
+            setErrore(
+                err.response?.data?.message ?? "Errore durante la creazione",
+            );
+        }
+    };
+
+    useEffect(() => {
+        fetchClients();
+    }, []);
+
     return <div>Clients</div>;
 };
 
