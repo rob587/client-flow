@@ -59,10 +59,10 @@ public function __construct(private TriageService $triage) {}
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(int $id)
     {
-         $ticket = Ticket::with(['client', 'messages.user'])->findOrFail($id);
-        return response()->json($ticket);
+        $ticket = Ticket::with(['client', 'messages.user'])->findOrFail($id);
+    return response()->json($ticket);
     }
 
     /**

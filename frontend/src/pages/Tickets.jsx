@@ -50,6 +50,9 @@ const Tickets = () => {
                             {tickets.map((ticket) => (
                                 <div
                                     key={ticket.id}
+                                    onClick={() =>
+                                        navigate(`/tickets/${ticket.id}`)
+                                    }
                                     className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 flex items-start justify-between"
                                 >
                                     <div>

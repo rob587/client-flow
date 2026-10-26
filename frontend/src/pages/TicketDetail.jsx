@@ -62,6 +62,13 @@ const TicketDetail = () => {
         }
     };
 
+    if (loading || !ticket)
+        return (
+            <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+                <p className="text-zinc-500 text-sm">Caricamento...</p>
+            </div>
+        );
+
     return (
         <>
             <div className="min-h-screen bg-zinc-950 flex">
