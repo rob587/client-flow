@@ -16,6 +16,32 @@ const prioritaColor = {
 };
 
 const TicketDetail = () => {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [ticket, setTicket] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [messaggio, setMessaggio] = useState("");
+    const [invio, setInvio] = useState(false);
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    useEffect(() => {
+        api.get(`/tickets/${id}`)
+            .then((res) => setTicket(res.data))
+            .catch(() => navigate("/tickets"))
+            .finally(() => setLoading(false));
+    }, [id]);
+
+    const handleStatus = async (nuovoStatus) => {
+        try {
+            const res = await api.put(`/tickets/${id}`, {
+                status: nuovoStatus,
+            });
+            setTicket(res.data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     return <div>TicketDetail</div>;
 };
 
