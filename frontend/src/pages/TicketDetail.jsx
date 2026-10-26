@@ -168,7 +168,7 @@ const TicketDetail = () => {
 
                     {/* Form nuovo messaggio */}
                     <form
-                        onSubmit={handleMessaggio}
+                        onSubmit={handleMessage}
                         className="bg-zinc-900 border border-zinc-800 rounded-xl p-4"
                     >
                         <textarea
