@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Plus, Search } from "lucide-react";
 import api from "../api/axios";
 import Sidebar from "../components/Sidebar";
 
@@ -17,15 +18,36 @@ const prioritaColor = {
 
 const Tickets = () => {
     const [tickets, setTickets] = useState([]);
+    const [filtrati, setFiltrati] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState("");
+    const [filtroStatus, setFiltroStatus] = useState("tutti");
     const navigate = useNavigate();
 
     useEffect(() => {
         api.get("/tickets")
-            .then((res) => setTickets(res.data))
+            .then((res) => {
+                setTickets(res.data);
+                setFiltrati(res.data);
+            })
             .catch(() => navigate("/login"))
             .finally(() => setLoading(false));
     }, []);
+
+    useEffect(() => {
+        let risultati = tickets;
+        if (filtroStatus !== "tutti") {
+            risultati = risultati.filter((t) => t.status === filtroStatus);
+        }
+        if (search.trim()) {
+            risultati = risultati.filter(
+                (t) =>
+                    t.titolo.toLowerCase().includes(search.toLowerCase()) ||
+                    t.client?.nome.toLowerCase().includes(search.toLowerCase()),
+            );
+        }
+        setFiltrati(risultati);
+    }, [search, filtroStatus, tickets]);
 
     return (
         <>

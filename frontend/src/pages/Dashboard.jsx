@@ -59,8 +59,10 @@ const Dashboard = () => {
                     inLavorazione: tickets.filter(
                         (t) => t.status === "in_lavorazione",
                     ).length,
+                    chiusi: tickets.filter((t) => t.status === "chiuso").length,
                     clienti: clientsRes.data.length,
                 });
+                setTicketsRecenti(tickets.slice(0, 5));
             })
             .catch(() => navigate("/login"));
     }, []);
