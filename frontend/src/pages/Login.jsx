@@ -84,6 +84,17 @@ const Login = () => {
                             >
                                 {loading ? "Accesso in corso..." : "Accedi"}
                             </button>
+
+                            <p className="text-center text-zinc-500 text-sm mt-4">
+                                Non hai un account?{" "}
+                                <button
+                                    type="button"
+                                    onClick={() => navigate("/register")}
+                                    className="text-amber-400 hover:text-amber-300 transition-colors"
+                                >
+                                    Registrati
+                                </button>
+                            </p>
                         </form>
                     </div>
                 </div>
