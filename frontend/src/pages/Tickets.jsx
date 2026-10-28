@@ -1,22 +1,28 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Search } from "lucide-react";
+import { Search, ArrowUpRight, SlidersHorizontal } from "lucide-react";
 import api from "../api/axios";
 import Sidebar from "../components/Sidebar";
 
 const statusBadge = {
-    aperto: "bg-emerald-400/10 text-emerald-400 border-emerald-400/20",
-    in_lavorazione: "bg-amber-400/10 text-amber-400 border-amber-400/20",
-    chiuso: "bg-zinc-700/50 text-zinc-400 border-zinc-700",
+    aperto: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+    in_lavorazione: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+    chiuso: "bg-zinc-700/40 text-zinc-500 border-zinc-700/60",
 };
 
 const prioritaColor = {
     alta: "text-red-400",
     media: "text-amber-400",
-    bassa: "text-zinc-400",
+    bassa: "text-zinc-500",
 };
 
-const Tickets = () => {
+const prioritaDot = {
+    alta: "bg-red-400",
+    media: "bg-amber-400",
+    bassa: "bg-zinc-500",
+};
+
+export default function Tickets() {
     const [tickets, setTickets] = useState([]);
     const [filtrati, setFiltrati] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -49,29 +55,73 @@ const Tickets = () => {
         setFiltrati(risultati);
     }, [search, filtroStatus, tickets]);
 
+    const filtri = [
+        { value: "tutti", label: "Tutti", count: tickets.length },
+        {
+            value: "aperto",
+            label: "Aperti",
+            count: tickets.filter((t) => t.status === "aperto").length,
+        },
+        {
+            value: "in_lavorazione",
+            label: "In lavorazione",
+            count: tickets.filter((t) => t.status === "in_lavorazione").length,
+        },
+        {
+            value: "chiuso",
+            label: "Chiusi",
+            count: tickets.filter((t) => t.status === "chiuso").length,
+        },
+    ];
+
     return (
-        <>
-            <div className="min-h-screen bg-zinc-950 flex">
-                <Sidebar />
+        <div className="min-h-screen bg-[#0a0a0a] flex">
+            <Sidebar />
 
-                <main className="flex-1 p-8 overflow-auto">
-                    {/* Header */}
-                    <div className="flex items-center justify-between mb-8">
-                        <div>
-                            <h2 className="text-2xl font-semibold text-zinc-100">
-                                Ticket
-                            </h2>
-                            <p className="text-zinc-500 text-sm mt-1">
-                                {tickets.length} ticket totali
-                            </p>
-                        </div>
+            <main className="flex-1 overflow-auto">
+                {/* Top bar */}
+                <div className="border-b border-zinc-800/80 px-8 py-4 flex items-center justify-between">
+                    <div>
+                        <h1 className="text-base font-semibold text-zinc-100">
+                            Ticket
+                        </h1>
+                        <p className="text-xs text-zinc-500 mt-0.5">
+                            {tickets.length} ticket totali
+                        </p>
                     </div>
+                </div>
 
-                    {/* Filtri */}
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="relative flex-1 max-w-sm">
+                <div className="px-8 py-6 space-y-4">
+                    {/* Filtri + Ricerca */}
+                    <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-1 bg-zinc-900/50 border border-zinc-800/80 rounded-lg p-1">
+                            {filtri.map(({ value, label, count }) => (
+                                <button
+                                    key={value}
+                                    onClick={() => setFiltroStatus(value)}
+                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                                        filtroStatus === value
+                                            ? "bg-zinc-800 text-zinc-100 shadow-sm"
+                                            : "text-zinc-500 hover:text-zinc-300"
+                                    }`}
+                                >
+                                    {label}
+                                    <span
+                                        className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                                            filtroStatus === value
+                                                ? "bg-zinc-700 text-zinc-300"
+                                                : "bg-zinc-800 text-zinc-600"
+                                        }`}
+                                    >
+                                        {count}
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="relative">
                             <Search
-                                size={14}
+                                size={13}
                                 className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"
                             />
                             <input
@@ -79,64 +129,60 @@ const Tickets = () => {
                                 placeholder="Cerca ticket o cliente..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-full pl-9 pr-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                                className="pl-8 pr-4 py-2 bg-zinc-900/50 border border-zinc-800/80 rounded-lg text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-amber-400/50 focus:border-amber-400/50 w-64"
                             />
-                        </div>
-                        <div className="flex gap-2">
-                            {[
-                                "tutti",
-                                "aperto",
-                                "in_lavorazione",
-                                "chiuso",
-                            ].map((s) => (
-                                <button
-                                    key={s}
-                                    onClick={() => setFiltroStatus(s)}
-                                    className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                                        filtroStatus === s
-                                            ? "bg-amber-400/10 text-amber-400 border border-amber-400/20"
-                                            : "text-zinc-400 hover:text-zinc-100 border border-zinc-800 hover:border-zinc-700"
-                                    }`}
-                                >
-                                    {s.replace("_", " ")}
-                                </button>
-                            ))}
                         </div>
                     </div>
 
-                    {/* Lista */}
-                    {loading ? (
-                        <p className="text-zinc-500 text-sm">Caricamento...</p>
-                    ) : filtrati.length === 0 ? (
-                        <div className="text-center py-16">
-                            <p className="text-zinc-500 text-sm">
-                                Nessun ticket trovato
-                            </p>
-                        </div>
-                    ) : (
-                        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-                            <table className="w-full">
-                                <thead>
-                                    <tr className="border-b border-zinc-800">
-                                        <th className="text-left text-xs text-zinc-500 font-medium px-5 py-3">
-                                            Ticket
-                                        </th>
-                                        <th className="text-left text-xs text-zinc-500 font-medium px-5 py-3">
-                                            Cliente
-                                        </th>
-                                        <th className="text-left text-xs text-zinc-500 font-medium px-5 py-3">
-                                            Categoria
-                                        </th>
-                                        <th className="text-left text-xs text-zinc-500 font-medium px-5 py-3">
-                                            Status
-                                        </th>
-                                        <th className="text-left text-xs text-zinc-500 font-medium px-5 py-3">
-                                            Priorità
-                                        </th>
+                    {/* Tabella */}
+                    <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/50 overflow-hidden">
+                        <table className="w-full">
+                            <thead>
+                                <tr className="border-b border-zinc-800/60">
+                                    <th className="text-left text-[11px] font-medium text-zinc-600 px-5 py-3 uppercase tracking-wide">
+                                        Ticket
+                                    </th>
+                                    <th className="text-left text-[11px] font-medium text-zinc-600 px-5 py-3 uppercase tracking-wide">
+                                        Cliente
+                                    </th>
+                                    <th className="text-left text-[11px] font-medium text-zinc-600 px-5 py-3 uppercase tracking-wide">
+                                        Categoria
+                                    </th>
+                                    <th className="text-left text-[11px] font-medium text-zinc-600 px-5 py-3 uppercase tracking-wide">
+                                        Status
+                                    </th>
+                                    <th className="text-left text-[11px] font-medium text-zinc-600 px-5 py-3 uppercase tracking-wide">
+                                        Priorità
+                                    </th>
+                                    <th className="px-5 py-3"></th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-zinc-800/60">
+                                {loading ? (
+                                    <tr>
+                                        <td
+                                            colSpan={6}
+                                            className="px-5 py-10 text-center text-zinc-600 text-sm"
+                                        >
+                                            Caricamento...
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {filtrati.map((ticket, i) => (
+                                ) : filtrati.length === 0 ? (
+                                    <tr>
+                                        <td
+                                            colSpan={6}
+                                            className="px-5 py-10 text-center"
+                                        >
+                                            <p className="text-zinc-500 text-sm">
+                                                Nessun ticket trovato
+                                            </p>
+                                            <p className="text-zinc-700 text-xs mt-1">
+                                                Prova a cambiare i filtri
+                                            </p>
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    filtrati.map((ticket) => (
                                         <tr
                                             key={ticket.id}
                                             onClick={() =>
@@ -144,29 +190,35 @@ const Tickets = () => {
                                                     `/tickets/${ticket.id}`,
                                                 )
                                             }
-                                            className={`cursor-pointer hover:bg-zinc-800/50 transition-colors ${
-                                                i < filtrati.length - 1
-                                                    ? "border-b border-zinc-800"
-                                                    : ""
-                                            }`}
+                                            className="cursor-pointer hover:bg-zinc-800/30 transition-colors group"
                                         >
-                                            <td className="px-5 py-3.5">
-                                                <span className="text-zinc-500 text-xs mr-2">
-                                                    #{ticket.id}
-                                                </span>
-                                                <span className="text-zinc-100 text-sm font-medium">
-                                                    {ticket.titolo}
-                                                </span>
+                                            <td className="px-5 py-4">
+                                                <div className="flex items-center gap-2.5">
+                                                    <span className="text-[11px] text-zinc-600 font-mono w-6">
+                                                        #{ticket.id}
+                                                    </span>
+                                                    <span className="text-sm text-zinc-200 font-medium group-hover:text-white transition-colors">
+                                                        {ticket.titolo}
+                                                    </span>
+                                                </div>
                                             </td>
-                                            <td className="px-5 py-3.5 text-zinc-400 text-sm">
+                                            <td className="px-5 py-4 text-sm text-zinc-400 whitespace-nowrap">
                                                 {ticket.client?.nome}
                                             </td>
-                                            <td className="px-5 py-3.5 text-zinc-400 text-sm">
-                                                {ticket.categoria ?? "—"}
+                                            <td className="px-5 py-4">
+                                                {ticket.categoria ? (
+                                                    <span className="text-xs text-zinc-400 bg-zinc-800 px-2 py-0.5 rounded-md">
+                                                        {ticket.categoria}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-zinc-700 text-xs">
+                                                        —
+                                                    </span>
+                                                )}
                                             </td>
-                                            <td className="px-5 py-3.5">
+                                            <td className="px-5 py-4">
                                                 <span
-                                                    className={`text-xs px-2 py-0.5 rounded-full border ${statusBadge[ticket.status]}`}
+                                                    className={`inline-flex items-center text-[11px] px-2 py-0.5 rounded-md border font-medium ${statusBadge[ticket.status]}`}
                                                 >
                                                     {ticket.status.replace(
                                                         "_",
@@ -174,21 +226,32 @@ const Tickets = () => {
                                                     )}
                                                 </span>
                                             </td>
-                                            <td
-                                                className={`px-5 py-3.5 text-sm font-medium ${prioritaColor[ticket.priorita]}`}
-                                            >
-                                                {ticket.priorita}
+                                            <td className="px-5 py-4">
+                                                <div className="flex items-center gap-2">
+                                                    <div
+                                                        className={`w-1.5 h-1.5 rounded-full ${prioritaDot[ticket.priorita]}`}
+                                                    />
+                                                    <span
+                                                        className={`text-sm font-medium ${prioritaColor[ticket.priorita]}`}
+                                                    >
+                                                        {ticket.priorita}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="px-5 py-4">
+                                                <ArrowUpRight
+                                                    size={13}
+                                                    className="text-zinc-700 group-hover:text-zinc-400 transition-colors ml-auto"
+                                                />
                                             </td>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </main>
-            </div>
-        </>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
     );
-};
-
-export default Tickets;
+}

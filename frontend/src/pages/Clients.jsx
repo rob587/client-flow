@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Building2, Mail, Phone } from "lucide-react";
+import { Plus, Building2, Mail, Phone, Search } from "lucide-react";
 import api from "../api/axios";
 import Sidebar from "../components/Sidebar";
 
-const Clients = () => {
+export default function Clients() {
     const [clients, setClients] = useState([]);
+    const [filtrati, setFiltrati] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
+    const [search, setSearch] = useState("");
     const [form, setForm] = useState({
         nome: "",
         email: "",
@@ -17,9 +19,31 @@ const Clients = () => {
     const [errore, setErrore] = useState("");
     const navigate = useNavigate();
 
+    useEffect(() => {
+        fetchClients();
+    }, []);
+
+    useEffect(() => {
+        if (search.trim()) {
+            setFiltrati(
+                clients.filter(
+                    (c) =>
+                        c.nome.toLowerCase().includes(search.toLowerCase()) ||
+                        c.email.toLowerCase().includes(search.toLowerCase()) ||
+                        c.azienda?.toLowerCase().includes(search.toLowerCase()),
+                ),
+            );
+        } else {
+            setFiltrati(clients);
+        }
+    }, [search, clients]);
+
     const fetchClients = () => {
         api.get("/clients")
-            .then((res) => setClients(res.data))
+            .then((res) => {
+                setClients(res.data);
+                setFiltrati(res.data);
+            })
             .catch(() => navigate("/login"))
             .finally(() => setLoading(false));
     };
@@ -39,127 +63,103 @@ const Clients = () => {
         }
     };
 
-    useEffect(() => {
-        fetchClients();
-    }, []);
-
     return (
-        <>
-            <div className="min-h-screen bg-zinc-950 flex">
-                <Sidebar />
+        <div className="min-h-screen bg-[#0a0a0a] flex">
+            <Sidebar />
 
-                <main className="flex-1 p-8 overflow-auto">
-                    {/* Header */}
-                    <div className="flex items-center justify-between mb-8">
-                        <div>
-                            <h2 className="text-2xl font-semibold text-zinc-100">
-                                Clienti
-                            </h2>
-                            <p className="text-zinc-500 text-sm mt-1">
-                                {clients.length} clienti registrati
-                            </p>
-                        </div>
-                        <button
-                            onClick={() => setShowForm(!showForm)}
-                            className="flex items-center gap-2 bg-amber-400 hover:bg-amber-300 text-zinc-900 text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
-                        >
-                            <Plus size={15} />
-                            {showForm ? "Annulla" : "Nuovo cliente"}
-                        </button>
+            <main className="flex-1 overflow-auto">
+                {/* Top bar */}
+                <div className="border-b border-zinc-800/80 px-8 py-4 flex items-center justify-between">
+                    <div>
+                        <h1 className="text-base font-semibold text-zinc-100">
+                            Clienti
+                        </h1>
+                        <p className="text-xs text-zinc-500 mt-0.5">
+                            {clients.length} clienti registrati
+                        </p>
                     </div>
+                    <button
+                        onClick={() => setShowForm(!showForm)}
+                        className="flex items-center gap-2 bg-amber-400 hover:bg-amber-300 text-zinc-900 text-xs font-semibold px-3 py-2 rounded-lg transition-colors"
+                    >
+                        <Plus size={13} />
+                        Nuovo cliente
+                    </button>
+                </div>
 
+                <div className="px-8 py-6 space-y-5">
                     {/* Form */}
                     {showForm && (
-                        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6">
-                            <h3 className="text-zinc-100 font-medium mb-5">
-                                Nuovo cliente
-                            </h3>
+                        <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/50 overflow-hidden">
+                            <div className="px-5 py-4 border-b border-zinc-800/80">
+                                <h2 className="text-sm font-medium text-zinc-100">
+                                    Nuovo cliente
+                                </h2>
+                            </div>
                             <form
                                 onSubmit={handleSubmit}
-                                className="grid grid-cols-2 gap-4"
+                                className="p-5 grid grid-cols-2 gap-4"
                             >
-                                <div>
-                                    <label className="block text-xs text-zinc-400 mb-1.5">
-                                        Nome *
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={form.nome}
-                                        onChange={(e) =>
-                                            setForm({
-                                                ...form,
-                                                nome: e.target.value,
-                                            })
-                                        }
-                                        className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-400"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs text-zinc-400 mb-1.5">
-                                        Email *
-                                    </label>
-                                    <input
-                                        type="email"
-                                        value={form.email}
-                                        onChange={(e) =>
-                                            setForm({
-                                                ...form,
-                                                email: e.target.value,
-                                            })
-                                        }
-                                        className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-400"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs text-zinc-400 mb-1.5">
-                                        Telefono
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={form.telefono}
-                                        onChange={(e) =>
-                                            setForm({
-                                                ...form,
-                                                telefono: e.target.value,
-                                            })
-                                        }
-                                        className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-400"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs text-zinc-400 mb-1.5">
-                                        Azienda
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={form.azienda}
-                                        onChange={(e) =>
-                                            setForm({
-                                                ...form,
-                                                azienda: e.target.value,
-                                            })
-                                        }
-                                        className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-400"
-                                    />
-                                </div>
+                                {[
+                                    {
+                                        key: "nome",
+                                        label: "Nome *",
+                                        type: "text",
+                                        required: true,
+                                    },
+                                    {
+                                        key: "email",
+                                        label: "Email *",
+                                        type: "email",
+                                        required: true,
+                                    },
+                                    {
+                                        key: "telefono",
+                                        label: "Telefono",
+                                        type: "text",
+                                        required: false,
+                                    },
+                                    {
+                                        key: "azienda",
+                                        label: "Azienda",
+                                        type: "text",
+                                        required: false,
+                                    },
+                                ].map(({ key, label, type, required }) => (
+                                    <div key={key}>
+                                        <label className="block text-xs text-zinc-500 mb-1.5">
+                                            {label}
+                                        </label>
+                                        <input
+                                            type={type}
+                                            value={form[key]}
+                                            onChange={(e) =>
+                                                setForm({
+                                                    ...form,
+                                                    [key]: e.target.value,
+                                                })
+                                            }
+                                            required={required}
+                                            className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700/80 rounded-lg text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-amber-400/50 focus:border-amber-400/50"
+                                        />
+                                    </div>
+                                ))}
                                 {errore && (
-                                    <div className="col-span-2 bg-red-950 border border-red-800 text-red-400 text-sm px-3 py-2 rounded-lg">
+                                    <div className="col-span-2 bg-red-950/50 border border-red-900/50 text-red-400 text-xs px-3 py-2 rounded-lg">
                                         {errore}
                                     </div>
                                 )}
-                                <div className="col-span-2 flex gap-3">
+                                <div className="col-span-2 flex gap-2 pt-1">
                                     <button
                                         type="submit"
-                                        className="bg-amber-400 hover:bg-amber-300 text-zinc-900 text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+                                        className="bg-amber-400 hover:bg-amber-300 text-zinc-900 text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
                                     >
-                                        Salva cliente
+                                        Salva
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setShowForm(false)}
-                                        className="text-zinc-400 hover:text-zinc-100 text-sm px-4 py-2 rounded-lg border border-zinc-700 hover:border-zinc-600 transition-colors"
+                                        className="text-zinc-400 hover:text-zinc-100 text-xs px-4 py-2 rounded-lg border border-zinc-800 hover:border-zinc-700 transition-colors"
                                     >
                                         Annulla
                                     </button>
@@ -168,46 +168,67 @@ const Clients = () => {
                         </div>
                     )}
 
-                    {/* Lista */}
+                    {/* Ricerca */}
+                    <div className="relative max-w-sm">
+                        <Search
+                            size={13}
+                            className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"
+                        />
+                        <input
+                            type="text"
+                            placeholder="Cerca cliente o azienda..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="pl-8 pr-4 py-2 bg-zinc-900/50 border border-zinc-800/80 rounded-lg text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-amber-400/50 w-full"
+                        />
+                    </div>
+
+                    {/* Grid clienti */}
                     {loading ? (
-                        <p className="text-zinc-500 text-sm">Caricamento...</p>
-                    ) : clients.length === 0 ? (
+                        <p className="text-zinc-600 text-sm">Caricamento...</p>
+                    ) : filtrati.length === 0 ? (
                         <div className="text-center py-16">
                             <p className="text-zinc-500 text-sm">
-                                Nessun cliente registrato
+                                Nessun cliente trovato
                             </p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-2 gap-4">
-                            {clients.map((client) => (
+                        <div className="grid grid-cols-3 gap-4">
+                            {filtrati.map((client) => (
                                 <div
                                     key={client.id}
-                                    className="bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-xl p-5 transition-colors"
+                                    className="rounded-xl border border-zinc-800/80 bg-zinc-900/50 p-5 hover:border-zinc-700/80 transition-colors group"
                                 >
-                                    <div className="flex items-start justify-between mb-3">
-                                        <div className="w-10 h-10 rounded-full bg-amber-400/20 flex items-center justify-center text-amber-400 font-semibold text-sm">
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className="w-9 h-9 rounded-full bg-amber-400/15 flex items-center justify-center text-amber-400 font-semibold text-sm">
                                             {client.nome
                                                 .charAt(0)
                                                 .toUpperCase()}
                                         </div>
                                         {client.azienda && (
-                                            <span className="text-xs text-zinc-500 bg-zinc-800 px-2 py-1 rounded-lg flex items-center gap-1">
-                                                <Building2 size={11} />
+                                            <span className="flex items-center gap-1 text-[11px] text-zinc-500 bg-zinc-800 px-2 py-1 rounded-md">
+                                                <Building2 size={10} />
                                                 {client.azienda}
                                             </span>
                                         )}
                                     </div>
-                                    <h3 className="text-zinc-100 font-medium mb-1">
+                                    <h3 className="text-sm font-medium text-zinc-100 mb-2 group-hover:text-white transition-colors">
                                         {client.nome}
                                     </h3>
-                                    <div className="space-y-1">
-                                        <p className="text-zinc-500 text-xs flex items-center gap-1.5">
-                                            <Mail size={11} />
+                                    <div className="space-y-1.5">
+                                        <p className="flex items-center gap-2 text-xs text-zinc-500">
+                                            <Mail
+                                                size={11}
+                                                className="text-zinc-600"
+                                            />
                                             {client.email}
                                         </p>
                                         {client.telefono && (
-                                            <p className="text-zinc-500 text-xs flex items-center gap-1.5">
-                                                <Phone size={11} />
+                                            <p className="flex items-center gap-2 text-xs text-zinc-500">
+                                                <Phone
+                                                    size={11}
+                                                    className="text-zinc-600"
+                                                />
                                                 {client.telefono}
                                             </p>
                                         )}
@@ -216,10 +237,8 @@ const Clients = () => {
                             ))}
                         </div>
                     )}
-                </main>
-            </div>
-        </>
+                </div>
+            </main>
+        </div>
     );
-};
-
-export default Clients;
+}
