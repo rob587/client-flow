@@ -16,7 +16,13 @@ const Login = () => {
             const res = await api.post("/login", { email, password });
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("user", JSON.stringify(res.data.user));
-            navigate("/dashboard");
+
+            const role = res.data.user.role;
+            if (role === "admin" || role === "operatore") {
+                navigate("/dashboard");
+            } else {
+                navigate("/miei-ticket");
+            }
         } catch (err) {
             setErrore("Email o password non validi");
         } finally {
