@@ -16,6 +16,7 @@ class AuthController extends Controller
             'email'    => 'required|email|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'role'     => 'sometimes|in:admin,operatore,cliente',
+            'client_id' => 'sometimes|nullable|exists:clients,id',
         ]);
 
         $user = User::create([
@@ -23,6 +24,7 @@ class AuthController extends Controller
             'email'    => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role'     => $validated['role'] ?? 'cliente',
+            'client_id' => $validated['client_id'] ?? null,
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
