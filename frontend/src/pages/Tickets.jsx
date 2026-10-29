@@ -28,13 +28,23 @@ export default function Tickets() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [filtroStatus, setFiltroStatus] = useState("tutti");
+    const [showForm, setShowForm] = useState(false);
+    const [clients, setClients] = useState([]);
+    const [form, setForm] = useState({
+        client_id: "",
+        titolo: "",
+        descrizione: "",
+    });
+    const [errore, setErrore] = useState("");
+    const [creating, setCreating] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
-        api.get("/tickets")
-            .then((res) => {
-                setTickets(res.data);
-                setFiltrati(res.data);
+        Promise.all([api.get("/tickets"), api.get("/clients")])
+            .then(([ticketsRes, clientsRes]) => {
+                setTickets(ticketsRes.data);
+                setFiltrati(ticketsRes.data);
+                setClients(clientsRes.data);
             })
             .catch(() => navigate("/login"))
             .finally(() => setLoading(false));
@@ -73,6 +83,27 @@ export default function Tickets() {
             count: tickets.filter((t) => t.status === "chiuso").length,
         },
     ];
+
+    const handleCrea = async (e) => {
+        e.preventDefault();
+        setErrore("");
+        setCreating(true);
+        try {
+            await api.post("/tickets", form);
+            setForm({ client_id: "", titolo: "", descrizione: "" });
+            setShowForm(false);
+            // ricarica i ticket
+            const res = await api.get("/tickets");
+            setTickets(res.data);
+            setFiltrati(res.data);
+        } catch (err) {
+            setErrore(
+                err.response?.data?.message ?? "Errore durante la creazione",
+            );
+        } finally {
+            setCreating(false);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-[#0a0a0a] flex">
