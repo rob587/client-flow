@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, ArrowUpRight, SlidersHorizontal } from "lucide-react";
+import { Search, ArrowUpRight, SlidersHorizontal, Plus } from "lucide-react";
 import api from "../api/axios";
 import Sidebar from "../components/Sidebar";
 
@@ -110,6 +110,131 @@ export default function Tickets() {
             <Sidebar />
 
             <main className="flex-1 overflow-auto">
+                {showForm && (
+                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+                        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-lg shadow-2xl">
+                            <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-800">
+                                <div>
+                                    <h2 className="text-sm font-semibold text-zinc-100">
+                                        Nuovo ticket
+                                    </h2>
+                                    <p className="text-xs text-zinc-500 mt-0.5">
+                                        L'AI assegnerà categoria e priorità
+                                        automaticamente
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => setShowForm(false)}
+                                    className="text-zinc-600 hover:text-zinc-400 transition-colors text-lg leading-none"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+
+                            <form
+                                onSubmit={handleCrea}
+                                className="p-6 space-y-4"
+                            >
+                                <div>
+                                    <label className="block text-xs text-zinc-500 mb-1.5">
+                                        Cliente *
+                                    </label>
+                                    <select
+                                        value={form.client_id}
+                                        onChange={(e) =>
+                                            setForm({
+                                                ...form,
+                                                client_id: e.target.value,
+                                            })
+                                        }
+                                        required
+                                        className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700/80 rounded-lg text-sm text-zinc-100 focus:outline-none focus:ring-1 focus:ring-amber-400/50"
+                                    >
+                                        <option value="">
+                                            Seleziona cliente...
+                                        </option>
+                                        {clients.map((c) => (
+                                            <option key={c.id} value={c.id}>
+                                                {c.nome} —{" "}
+                                                {c.azienda ?? c.email}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs text-zinc-500 mb-1.5">
+                                        Titolo *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={form.titolo}
+                                        onChange={(e) =>
+                                            setForm({
+                                                ...form,
+                                                titolo: e.target.value,
+                                            })
+                                        }
+                                        placeholder="Es. Problema con l'accesso al portale"
+                                        required
+                                        className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700/80 rounded-lg text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-amber-400/50"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs text-zinc-500 mb-1.5">
+                                        Descrizione *
+                                    </label>
+                                    <textarea
+                                        value={form.descrizione}
+                                        onChange={(e) =>
+                                            setForm({
+                                                ...form,
+                                                descrizione: e.target.value,
+                                            })
+                                        }
+                                        placeholder="Descrivi il problema nel dettaglio..."
+                                        rows={4}
+                                        required
+                                        className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700/80 rounded-lg text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-amber-400/50 resize-none"
+                                    />
+                                </div>
+
+                                {errore && (
+                                    <div className="bg-red-950/50 border border-red-900/50 text-red-400 text-xs px-3 py-2 rounded-lg">
+                                        {errore}
+                                    </div>
+                                )}
+
+                                {creating && (
+                                    <div className="flex items-center gap-2 text-xs text-amber-400 bg-amber-400/5 border border-amber-400/20 px-3 py-2 rounded-lg">
+                                        <div className="w-3 h-3 border border-amber-400 border-t-transparent rounded-full animate-spin" />
+                                        L'AI sta analizzando il ticket...
+                                    </div>
+                                )}
+
+                                <div className="flex gap-2 pt-1">
+                                    <button
+                                        type="submit"
+                                        disabled={creating}
+                                        className="flex-1 bg-amber-400 hover:bg-amber-300 text-zinc-900 text-xs font-semibold py-2 rounded-lg transition-colors disabled:opacity-50"
+                                    >
+                                        {creating
+                                            ? "Creazione in corso..."
+                                            : "Crea ticket"}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowForm(false)}
+                                        className="px-4 py-2 text-zinc-400 hover:text-zinc-100 text-xs border border-zinc-800 hover:border-zinc-700 rounded-lg transition-colors"
+                                    >
+                                        Annulla
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                )}
                 {/* Top bar */}
                 <div className="border-b border-zinc-800/80 px-8 py-4 flex items-center justify-between">
                     <div>
@@ -120,6 +245,13 @@ export default function Tickets() {
                             {tickets.length} ticket totali
                         </p>
                     </div>
+                    <button
+                        onClick={() => setShowForm(true)}
+                        className="flex items-center gap-2 bg-amber-400 hover:bg-amber-300 text-zinc-900 text-xs font-semibold px-3 py-2 rounded-lg transition-colors"
+                    >
+                        <Plus size={13} />
+                        Nuovo ticket
+                    </button>
                 </div>
 
                 <div className="px-8 py-6 space-y-4">
