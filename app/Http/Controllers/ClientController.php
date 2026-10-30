@@ -84,4 +84,47 @@ class ClientController extends Controller
         Client::findOrFail($id)->delete();
         return response()->noContent();
     }
+    public function mieiTicket(Request $request)
+    {
+        $user = $request->user()->load('client');
+
+        if (!$user->client) {
+            return response()->json([]);
+        }
+
+        $tickets = Ticket::with(['client', 'messages'])
+            ->where('client_id', $user->client->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($tickets);
+    }
+
+    public function storeMio(Request $request)
+    {
+        $user = $request->user()->load('client');
+
+        if (!$user->client) {
+            return response()->json(['errore' => 'Nessun cliente associato al tuo account'], 403);
+        }
+
+        $validated = $request->validate([
+            'titolo'      => 'required|string|max:255',
+            'descrizione' => 'required|string',
+        ]);
+
+        $triage = $this->triage->analizza($validated['titolo'], $validated['descrizione']);
+
+        $ticket = Ticket::create([
+            'client_id'   => $user->client->id,
+            'titolo'      => $validated['titolo'],
+            'descrizione' => $validated['descrizione'],
+            'categoria'   => $triage['categoria'],
+            'priorita'    => $triage['priorita'],
+        ]);
+
+        return response()->json($ticket->load('client'), 201);
+    }
+
+
 }
