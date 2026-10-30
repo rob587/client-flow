@@ -25,6 +25,40 @@ const ClientDashboard = () => {
     const [errore, setErrore] = useState("");
     const [creating, setCreating] = useState(false);
 
+    useEffect(() => {
+        fetchTickets();
+    }, []);
+
+    const fetchTickets = () => {
+        api.get("/miei-ticket")
+            .then((res) => setTickets(res.data))
+            .catch(() => navigate("/login"))
+            .finally(() => setLoading(false));
+    };
+
+    const handleCrea = async (e) => {
+        e.preventDefault();
+        setErrore("");
+        setCreating(true);
+        try {
+            await api.post("/miei-ticket", form);
+            setForm({ titolo: "", descrizione: "" });
+            setShowForm(false);
+            fetchTickets();
+        } catch (err) {
+            setErrore(
+                err.response?.data?.message ?? "Errore durante la creazione",
+            );
+        } finally {
+            setCreating(false);
+        }
+    };
+
+    const logout = () => {
+        localStorage.clear();
+        navigate("/login");
+    };
+
     return <div>ClientDashboard</div>;
 };
 
