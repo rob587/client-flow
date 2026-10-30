@@ -5,7 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import Tickets from "./pages/Tickets";
 import Clients from "./pages/Clients";
 import TicketDetail from "./pages/TicketDetail";
-// import ClienteDashboard from "./pages/ClienteDashboard";
+import ClienteDashboard from "./pages/ClienteDashboard";
 
 function App() {
     const token = localStorage.getItem("token");

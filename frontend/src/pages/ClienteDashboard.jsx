@@ -15,7 +15,7 @@ const prioritaBadge = {
     bassa: "bg-zinc-700/40 text-zinc-500 border-zinc-700/60",
 };
 
-const ClientDashboard = () => {
+const ClienteDashboard = () => {
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem("user"));
     const [tickets, setTickets] = useState([]);
@@ -284,4 +284,4 @@ const ClientDashboard = () => {
     );
 };
 
-export default ClientDashboard;
+export default ClienteDashboard;
