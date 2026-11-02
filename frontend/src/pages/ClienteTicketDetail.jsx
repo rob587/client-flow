@@ -25,7 +25,7 @@ const ClienteTicketDetail = () => {
     const user = JSON.parse(localStorage.getItem("user"));
 
     useEffect(() => {
-        api.get(`/tickets/${id}`)
+        api.get(`/miei-ticket/${id}`)
             .then((res) => setTicket(res.data))
             .catch(() => navigate("/miei-ticket"))
             .finally(() => setLoading(false));
@@ -36,12 +36,12 @@ const ClienteTicketDetail = () => {
         if (!messaggio.trim()) return;
         setInvio(true);
         try {
-            await api.post(`/tickets/${id}/messages`, {
+            await api.post(`/miei-ticket/${id}/messages`, {
                 messaggio,
                 user_id: user.id,
             });
             setMessaggio("");
-            const res = await api.get(`/tickets/${id}`);
+            const res = await api.get(`/miei-ticket/${id}`);
             setTicket(res.data);
         } catch (err) {
             console.error(err);
