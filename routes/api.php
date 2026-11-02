@@ -28,7 +28,9 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::middleware('role:cliente')->group(function () {
-    Route::get('/miei-ticket', [TicketController::class, 'mieiTicket']);
+   Route::get('/miei-ticket', [TicketController::class, 'mieiTicket']);
     Route::post('/miei-ticket', [TicketController::class, 'storeMio']);
+    Route::get('/miei-ticket/{id}', [TicketController::class, 'show']);
+    Route::post('/tickets/{ticketId}/messages', [TicketMessageController::class, 'store']);
 });
 });

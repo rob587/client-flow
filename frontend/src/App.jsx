@@ -6,6 +6,7 @@ import Tickets from "./pages/Tickets";
 import Clients from "./pages/Clients";
 import TicketDetail from "./pages/TicketDetail";
 import ClienteDashboard from "./pages/ClienteDashboard";
+import ClienteTicketDetail from "./pages/ClienteTicketDetail";
 
 function App() {
     const token = localStorage.getItem("token");
@@ -67,6 +68,17 @@ function App() {
                         <Navigate to="/dashboard" />
                     ) : (
                         <Navigate to="/miei-ticket" />
+                    )
+                }
+            />
+
+            <Route
+                path="/miei-ticket/:id"
+                element={
+                    token && isCliente ? (
+                        <ClienteTicketDetail />
+                    ) : (
+                        <Navigate to="/login" />
                     )
                 }
             />
